@@ -32,11 +32,7 @@ jobs:
           fi
           # Passing value of New Tag to Workflow Environment Variables
           echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
-
-      - name: Check New Tag
-        run: |
-          echo New Tag [ ${{ env.NEW_TAG }} ]
-          echo Cur SHA [ ${{ github.sha }} ]
+          echo New TAG [$NEW_TAG][$?]
 
       - name: Create Tag
         uses: actions/github-script@v3
