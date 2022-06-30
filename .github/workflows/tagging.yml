@@ -13,48 +13,8 @@ jobs:
         with:
             fetch-depth: 0
 
-      - name: Tagging
-        run: |
-          CUR_TAG=$(git describe | grep -E '^[0-9]+\.[0-9]+.[0-9].+$' && true || echo 0.0.0)
-          echo Cur TAG [$CUR_TAG][$?]
-          if [ "$CUR_TAG" == "0.0.0" ]; then
-            NEW_TAG=0.0.1
-          else
-            MAJOR=$(git describe | cut -f 1 -d. | cut -f 1 -d-)
-            MINOR=$(git describe | cut -f 2 -d. | cut -f 1 -d-)
-            PATCH=$(( $(git describe | cut -f 3 -d. | cut -f 1 -d-) + 1 ))
-
-            echo MAJOR = [$MAJOR]
-            echo MINOR = [$MINOR]
-            echo PATCH = [$PATCH]
-
-            NEW_TAG=$MAJOR.$MINOR.$PATCH
-          fi
-          # Passing value of New Tag to Workflow Environment Variables
-          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
-          echo New TAG [$NEW_TAG][$?]
-
-      - name: Create Tag
-        uses: actions/github-script@v3
-        if: ${{ github.ref == 'refs/heads/master' }}
-        with:
-          debug: true
-          script: |
-            annotatedTag = await github.git.createTag({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              tag: "${{ env.NEW_TAG }}",
-              message: "Tag ${{ env.NEW_TAG }}",
-              object: context.sha,
-              type: "commit",
-            })
-
-            await github.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: "refs/tags/${{ env.NEW_TAG }}",
-              sha: annotatedTag.data.sha
-            })
+      - name: Tag Repo
+        uses: MacroFab/MFDevelopment/actions/tag
 
   step2:
     name: Step 2
